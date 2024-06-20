@@ -3,19 +3,24 @@ const app=express();
 const mongoose=require("mongoose");
 const Listing=require("./models/listing");
 
+const ejsMate=require("ejs-mate");
 
 const path=require("path");
 // const { v4: uuidv4 } = require('uuid');
-// const methodOverride=require("method-override");
+const methodOverride=require("method-override");
 
 
 app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"views"));
-// app.use(express.static("public"));
-// app.use(methodOverride('_method'));
+
+app.use(express.static(path.join(__dirname,"public")));
+
+
+app.use(methodOverride('_method'));
 
 app.use(express.urlencoded({extended:true}));
 // app.use(express.json());
+app.engine("ejs",ejsMate);
 
 const mongoUrl='mongodb://127.0.0.1:27017/wanderlust';
 
@@ -86,3 +91,22 @@ app.get("/listings/:id/edit",async(req,res)=>{
     const listing=await Listing.findById(id);
     res.render("listings/edit.ejs",{listing});
 }) 
+
+
+//update route
+app.put("/listings/:id",async(req,res)=>{
+    let {id}=req.params;
+   await Listing.findByIdAndUpdate(id,{...req.body.listing});
+   res.redirect(`/listings/${id}`);
+
+
+})
+
+app.delete("/listings/:id",async(req,res)=>{
+    let {id}=req.params;
+   let deleted=await Listing.findByIdAndDelete(id);
+   console.log(deleted);
+   res.redirect(`/listings`);
+
+
+})
