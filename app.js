@@ -9,10 +9,14 @@ const ExpressError=require("./utils/expresserror.js");
 const {listingSchema,reviewSchema}=require("./schema.js");
 const Review=require("./models/review.js");
 const wrapasync = require("./utils/wrapasync.js");
-const listings=require("./routes/listings.js");
-const reviews=require("./routes/reviews.js");
+const listingsRouter=require("./routes/listings.js");
+const reviewsRouter=require("./routes/reviews.js");
+const userRouter=require("./routes/users.js");
 const session=require("express-session");
 const flash=require("connect-flash");
+const passport=require("passport");
+const localStrategy=require("passport-local");
+const User=require("./models/user.js");
 
 
 app.set("view engine","ejs");
@@ -55,6 +59,11 @@ app.get("/",(req,res)=>{
 
 app.use(session(sessionOptions));
 app.use(flash());
+app.use(passport.initialize());
+
+passport.use(new localStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 app.use((req,res,next)=>{
     res.locals.success=req.flash("success");
@@ -70,11 +79,21 @@ app.listen(8080,()=>{
 
 
 
+// app.get("/demouser",async(req,res)=>{
+//     let fakeUser=new User({
+//         email:"s@gmail.com",
+//         username:"student",
+//     })
+//    let registered=await User.register(fakeUser,"hello");
+//    res.send(registered);
+// })
 
 
 
-app.use("/listings",listings);
-app.use("/listings/:id/reviews",reviews);
+
+app.use("/listings",listingsRouter);
+app.use("/listings/:id/reviews",reviewsRouter);
+app.use("/listings/users",userRouter);
 
 
 

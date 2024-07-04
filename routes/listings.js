@@ -29,7 +29,7 @@ router.get("/", wrapasync(async (req, res) => {
 
 //New Route
 router.get("/new",(req,res)=>{
-    res.render("listings/new.ejs",);
+    res.render("listings/new.ejs");
 })  
 
 
