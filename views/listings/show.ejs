@@ -6,7 +6,7 @@
             <img src="<%= listing.image %>" class="card-img-top offset-2" alt="listing_image"   style="width:35rem !important; height: 20rem;" >
             <div class="card-body">
               <p class="card-text offset-2">
-             
+                Owned By:@ <b> <%= listing.owner.username %></b><br><br>
                     <%= listing.description %><br><br>
                     &#8377;<%= listing.price %>/night<br><br>
                     <%= listing.location %><br><br>
@@ -15,6 +15,7 @@
              
 
               </p>
+              <% if(currentUser && currentUser._id.equals(listing.owner._id)){ %>
               <div class="btnss offset-2">
                 <form method="GET" action="/listings/<%= listing._id %>/edit" >
                     <button class="edit-btn ">EDIT </button>
@@ -23,13 +24,13 @@
                 <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
                     <button class="del-btn  " style="background-color: #121212 !important;">DELETE</button>
                 </form>        
-                
-                
-              
               </div>
+              <% } %>
 
               <hr class="offset-2">
+            
               <div class="offset-2">
+                <% if(currentUser){ %>
                 <h4>Leave a review</h4>
                 <form method="POST" action="/listings/<%= listing._id %>/reviews" >
                   <div class="mb-3">
@@ -45,8 +46,8 @@
                 
                <button class="btn btn-dark edit-btn">Submit</button><BR><BR><BR>
                   </form>
-              </div>
-
+              <% } %>
+            </div>
 
               <hr class="offset-2">
 
@@ -56,7 +57,7 @@
             <% for(review of listing.reviews){ %>
               <div class="card offset-2 col-1 mb-3" style="width: 18rem;">
                 <div class="card-body">
-                  <h5>Steve Jobs</h5>
+                  <h5> <%= review.author.username %></h5>
                   <p class="card-text"><%= review.comment %><br><%= review.rating %> &#9733;</p>
                 </div>
                 <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">                

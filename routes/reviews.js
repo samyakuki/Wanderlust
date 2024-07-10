@@ -5,29 +5,17 @@ const ExpressError=require("../utils/expresserror.js");
 const Listing=require("../models/listing.js");
 const {listingSchema,reviewSchema}=require("../schema.js");
 const Review=require("../models/review.js");
-
-
-
-const validateReview=(req,res,next)=>{
-    let  {error}=reviewSchema.validate(req.body);
-    if(error){
-    let errMsg=error.details.map((el)=>el.message).join(",");
-
-    throw new ExpressError(400,errMsg);
-    }
-    else{
-        next();
-    }
-}
+const {isLoggedIn,validateReview,isReviewauthor}=require("../middleware.js");
 
 
 
 
 
 //Reviews Post Route
-router.post("/",validateReview,wrapasync(async(req,res)=>{
+router.post("/",isLoggedIn,validateReview,wrapasync(async(req,res)=>{
     let listing=await Listing.findById(req.params.id);
     let newRew=new Review(req.body.review);
+    newRew.author=req.user._id;
     listing.reviews.push(newRew);
     console.log(req.params.id);
     await newRew.save();
@@ -40,7 +28,7 @@ router.post("/",validateReview,wrapasync(async(req,res)=>{
 
 //Reviews Delete  Route
 
-router.delete("/:reviewId", wrapasync(async (req, res, next) => {
+router.delete("/:reviewId",isLoggedIn,isReviewauthor, wrapasync(async (req, res, next) => {
     let { id, reviewId } = req.params;
 
     await Listing.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
