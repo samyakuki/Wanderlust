@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/"><span class="material-symbols-outlined">
+      <a class="navbar-brand" href="/listings"><span class="material-symbols-outlined">
         explore
         </span></a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" >
@@ -8,17 +8,24 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-            <a class="nav-link " href="/">Home</a>
-            <a class="nav-link" href="/listings">All Listings</a>
-            <a class="nav-link" href="/listings/new">Add New Listing</a>
+
+            <a class="nav-link" href="/listings">Explore </a>
+
         </div>
         <div class="navbar-nav ms-auto">
+          <form class="d-flex" role="search">
+            <input class="form-control me-2" type="search" placeholder="Search Destinations" style="border-radius:1rem;" >
+            <button class="btn btn-dark add-btn btn-outline-success " type="submit"> <i  style="display: inline  ; margin-right: 0.75rem;" class="fa-solid fa-magnifying-glass"></i>Search</button>
+          </form>
+        </div>
+        <div class="navbar-nav ms-auto">
+          <a class="nav-link" href="/listings/new">List Your Home</a>
           <% if(!currentUser){ %>
-          <a class="nav-link " href="/listings/users/signup">Sign-up</a>
-          <a class="nav-link" href="/listings/users/login">Login</a>
+          <a class="nav-link " href="/listings/users/signup"><b>Sign-up</b></a>
+          <a class="nav-link" href="/listings/users/login"><b>Login</b></a>
           <% } %>
           <% if(currentUser){ %>
-          <a class="nav-link" href="/listings/users/logout">Logout</a>
+          <a class="nav-link" href="/listings/users/logout"><b>Logout</b></a>
           <% } %>
 
 

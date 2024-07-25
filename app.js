@@ -1,3 +1,8 @@
+
+if(process.env.NODE_ENV!='production'){
+  require('dotenv').config()
+}
+
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
@@ -5,6 +10,7 @@ const ejsMate = require('ejs-mate');
 const path = require('path');
 const methodOverride = require('method-override');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const flash = require('connect-flash');
 const passport = require('passport');
 const localStrategy = require('passport-local');
@@ -22,7 +28,7 @@ app.use(methodOverride('_method'));
 app.use(express.urlencoded({ extended: true }));
 app.engine('ejs', ejsMate);
 
-const mongoUrl = 'mongodb://127.0.0.1:27017/wanderlust';
+const dbUrl=process.env.ATLAS_DB_URL;
 main()
   .then(() => {
     console.log('connected to DB');
@@ -32,10 +38,23 @@ main()
   });
 
 async function main() {
-  await mongoose.connect(mongoUrl);
+  await mongoose.connect(dbUrl);
 }
 
+const store=MongoStore.create({
+  mongoUrl:dbUrl,
+  crypto:{
+    secret:process.env.SECRET,
+  },
+  touchAfter:24*60*60,
+});
+
+store.on("error",()=>{
+  console.log("error in mongo session store");
+})
+
 const sessionOptions = {
+  store,
   secret: 'mysupersecretcode',
   resave: false,
   saveUninitialized: true,
@@ -46,9 +65,11 @@ const sessionOptions = {
   },
 };
 
-app.get('/', (req, res) => {
-  res.send('Hi, I am root');
-});
+// app.get('/', (req, res) => {
+//   res.send('Hi, I am root');
+// });
+
+
 
 app.use(session(sessionOptions));
 app.use(flash());
@@ -60,11 +81,13 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
+  console.log(req.user); // Debugging statement
   res.locals.success = req.flash('success');
   res.locals.error = req.flash('error');
   res.locals.currentUser = req.user;
   next();
 });
+
 
 app.listen(8080, () => {
   console.log('new request received');

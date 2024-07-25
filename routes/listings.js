@@ -7,85 +7,32 @@ const {listingSchema,reviewSchema}=require("../schema.js");
 const passport=require("passport");
 const localStrategy=require("passport-local");
 const {isLoggedIn,isOwner,validateListing}=require("../middleware.js");
+const listingController=require("../controllers/listings.js");
+const multer  = require('multer');
+const {storage}=require("../cloudconfig.js");
 
-
-
+const upload = multer({ storage });
 
 
 //Index Route
-router.get("/", wrapasync(async (req, res) => {
-    const allListings = await Listing.find({});
-    res.render("listings/index.ejs", { allListings });
-  }));
-
+router.get("/", wrapasync(listingController.index));
 
 //New Route
-router.get("/new", isLoggedIn,(req, res) => {
-   
-    res.render("listings/new.ejs");
-});
+router.get("/new", isLoggedIn,listingController.new);
 
 //Show Route
-router.get("/:id", wrapasync(async(req,res)=>{
-    let {id}=req.params;
-    const listing=await Listing.findById(id).populate({path:"reviews",populate:{
-        path:"author",
-    }}).populate("owner");
-    if(!listing){
-   req.flash("error","Listing Does Not Exist");
-   res.redirect("/listings");
-    }
-    // console.log(listing);
-    res.render("listings/show.ejs",{listing});
-}))  
-
+router.get("/:id", wrapasync(listingController.show));  
 
 //Create Route
-router.post("/",isLoggedIn,validateListing, wrapasync(async(req,res,next)=>{
-  
-    const newListing= new Listing(req.body.listing);
-    newListing.owner=req.user._id;
-    await newListing.save();
-    req.flash("success","New listing Created");
-    res.redirect("/listings");
-    
-}))
-
+router.post("/",isLoggedIn, upload.single('listing[image]'),validateListing, wrapasync(listingController.create) ) ;
 
 //Edit Route
-router.get("/:id/edit",isLoggedIn,isOwner, wrapasync(async(req,res)=>{
-    let {id}=req.params;
-    const listing=await Listing.findById(id);
-    if(!listing){
-        req.flash("error","Listing Does Not Exist");
-        res.redirect("/listings");
-         }
-    res.render("listings/edit.ejs",{listing});
-}) )
-
+router.get("/:id/edit",isLoggedIn,isOwner, wrapasync(listingController.edit) );
 
 //update route
-router.put("/:id",isLoggedIn,isOwner, validateListing
-    ,wrapasync(async(req,res)=>{
-    let {id}=req.params;
-    let listing=Listing.findById(id);
-   await Listing.findByIdAndUpdate(id,{...req.body.listing});
-   res.redirect(`/listings/${id}`);
-
-
-}))
-
+router.put("/:id",isLoggedIn,isOwner,  upload.single('listing[image]'),validateListing,wrapasync(listingController.update));
 
 //Delete Route
-router.delete("/:id",isLoggedIn, isOwner,wrapasync(async(req,res)=>{
-    let {id}=req.params;
-   let deleted=await Listing.findByIdAndDelete(id);
-   req.flash("success","Listing Deleted");
-
-   res.redirect(`/listings`);
-
-
-}))
-
+router.delete("/:id",isLoggedIn, isOwner,wrapasync(listingController.delete));
 
 module.exports=router;

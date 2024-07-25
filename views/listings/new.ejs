@@ -4,7 +4,7 @@
     <div class="row">
         <div class="col-8 offset-2">
             <h3>Create a new listing</h3><br>
-    <form method="POST" action="/listings"  >
+    <form method="POST" action="/listings" enctype="multipart/form-data"  >
         <div class="mb-3">
             <label for="title" class="form-label">Title</label>
             <input name="listing[title]" placeholder="Add a catchy title" type="text" class="form-control " required>
@@ -16,9 +16,10 @@
          </div>
         
         <div class="mb-3">
-            <label for="image" class="form-label">Image</label>
-            <input name="listing[image]" placeholder="Enter image link" type="text"  class="form-control ">
+            <label for="image" class="form-label">Upload Image</label>
+            <input name="listing[image]" type="file"  class="form-control ">
         </div>
+        
         <div class="row">
             <div class="mb-3 col-md-4">
                 <label for="price" class="form-label">Price</label>
@@ -48,3 +49,27 @@
     </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
